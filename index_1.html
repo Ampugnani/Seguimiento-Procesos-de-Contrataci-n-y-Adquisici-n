@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANES — Matriz de Consolidaciones 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#141c2e; --navy-mid:#1e2a42; --navy-light:#28374f;
+  --accent:#4f8ef7; --accent-dim:rgba(79,142,247,.12);
+  --green:#34c77b; --green-dim:rgba(52,199,123,.12);
+  --amber:#f5a623; --amber-dim:rgba(245,166,35,.12);
+  --red:#e05555; --red-dim:rgba(224,85,85,.12);
+  --purple:#a78bfa; --teal:#2dd4bf;
+  --border:rgba(255,255,255,.07);
+  --text:#e8ecf2; --text-muted:#6a7890; --radius:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--navy);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh;}
+
+/* HEADER */
+header{background:var(--navy-mid);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--accent);letter-spacing:2.5px;}
+.header-title{font-size:13px;color:var(--text-muted);margin-left:14px;}
+.header-left{display:flex;align-items:center;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.save-ind{font-size:12px;color:var(--green);display:flex;align-items:center;gap:5px;opacity:0;transition:opacity .4s;}
+.save-ind.show{opacity:1;}
+.save-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;font-weight:500;transition:all .15s;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted);}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.btn-danger{background:transparent;border:1px solid var(--border);color:var(--red);}
+.btn-danger:hover{background:var(--red-dim);border-color:var(--red);}
+.btn-green{background:var(--green);color:#0a1f14;font-weight:600;}
+.btn-green:hover{background:#4dd98c;}
+
+/* MAIN */
+main{padding:22px 28px;max-width:100%;margin:0 auto;}
+
+/* PROGRESS OVERVIEW */
+.po-wrap{background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius);padding:16px 22px;margin-bottom:18px;}
+.po-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.po-title{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);font-weight:500;}
+.po-pct{font-family:'DM Mono',monospace;font-size:22px;font-weight:600;color:var(--green);}
+.po-track{height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-bottom:12px;}
+.po-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,var(--accent),var(--green));}
+.po-pills{display:flex;gap:10px;flex-wrap:wrap;}
+.po-pill{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);}
+.po-pip{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* STATS */
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px;margin-bottom:18px;}
+.stat-card{background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.sc-accent::before{background:var(--accent);}
+.sc-green::before{background:var(--green);}
+.sc-amber::before{background:var(--amber);}
+.sc-red::before{background:var(--red);}
+.sc-purple::before{background:var(--purple);}
+.stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.stat-value{font-size:20px;font-weight:600;font-family:'DM Mono',monospace;}
+.sv-accent{color:var(--accent);} .sv-green{color:var(--green);}
+.sv-amber{color:var(--amber);}   .sv-red{color:var(--red);}
+.sv-purple{color:var(--purple);}
+
+/* FILTERS */
+.filters-bar{background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;margin-bottom:14px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;}
+.filter-group{display:flex;flex-direction:column;gap:4px;}
+.filter-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;}
+select.filt{background:var(--navy-light);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 10px;cursor:pointer;outline:none;min-width:140px;}
+select.filt:focus{border-color:var(--accent);}
+.filters-right{margin-left:auto;display:flex;align-items:flex-end;gap:10px;}
+.results-count{font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;padding-bottom:2px;}
+
+/* TABLE WRAPPER — horizontal scroll */
+.table-outer{width:100%;overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);}
+.table-outer::-webkit-scrollbar{height:8px;}
+.table-outer::-webkit-scrollbar-track{background:var(--navy-mid);}
+.table-outer::-webkit-scrollbar-thumb{background:var(--navy-light);border-radius:4px;}
+.table-outer::-webkit-scrollbar-thumb:hover{background:#3a5070;}
+table{width:max-content;min-width:100%;border-collapse:collapse;}
+thead th{background:var(--navy-mid);padding:9px 10px;text-align:left;font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;z-index:10;}
+thead th.th-grp{border-top:2px solid var(--border);}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.025);}
+tbody td{padding:7px 10px;vertical-align:top;}
+tr.crit-Alta  td:first-child{border-left:2px solid var(--red);}
+tr.crit-Media td:first-child{border-left:2px solid var(--amber);}
+tr.crit-Baja  td:first-child{border-left:2px solid var(--green);}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap;}
+.b-blue  {background:rgba(79,142,247,.15);color:#7eb3fb;}
+.b-red   {background:rgba(224,85,85,.15);color:#f08080;}
+.b-green {background:rgba(52,199,123,.15);color:#5ddba0;}
+.b-amber {background:rgba(245,166,35,.15);color:#f9c85a;}
+.b-purple{background:rgba(167,139,250,.15);color:#c4b0fc;}
+.b-teal  {background:rgba(45,212,191,.15);color:#5eead4;}
+.b-gray  {background:rgba(138,150,168,.15);color:#a0aab8;}
+.b-pend  {background:rgba(138,150,168,.15);color:#a0aab8;}
+.b-proc  {background:rgba(79,142,247,.15);color:#7eb3fb;}
+.b-rev   {background:rgba(245,166,35,.15);color:#f9c85a;}
+.b-comp  {background:rgba(52,199,123,.15);color:#5ddba0;}
+.b-bloq  {background:rgba(224,85,85,.15);color:#f08080;}
+.b-calta {background:rgba(224,85,85,.18);color:#f08080;}
+.b-cmedia{background:rgba(245,166,35,.18);color:#f9c85a;}
+.b-cbaja {background:rgba(52,199,123,.18);color:#5ddba0;}
+/* alerta badges */
+.b-alerta-sin    {background:rgba(138,150,168,.1);color:#6a7890;}
+.b-alerta-info   {background:rgba(79,142,247,.15);color:#7eb3fb;}
+.b-alerta-aviso  {background:rgba(245,166,35,.18);color:#f9c85a;}
+.b-alerta-critica{background:rgba(224,85,85,.18);color:#f08080;}
+
+/* SELECTS IN CELLS */
+select.csel{background:var(--navy-light);border:1px solid transparent;border-radius:6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 6px;cursor:pointer;outline:none;width:100%;margin-top:3px;transition:border-color .15s;}
+select.csel:hover{border-color:var(--border);}
+select.csel:focus{border-color:var(--accent);}
+
+/* EDITABLE TEXT CELLS */
+.ecell{display:inline-block;cursor:text;border-radius:5px;padding:2px 5px;transition:background .15s;min-width:30px;word-break:break-word;line-height:1.45;outline:none;border:1px solid transparent;font-size:12px;}
+.ecell:hover{background:rgba(255,255,255,.05);}
+.ecell:focus{background:var(--navy-light);border-color:var(--accent);}
+.ecell.muted{font-size:11px;color:var(--text-muted);}
+.ecell.mono{font-family:'DM Mono',monospace;font-size:11px;}
+textarea.tcell{display:block;width:100%;min-width:130px;min-height:34px;background:transparent;border:1px solid transparent;border-radius:5px;padding:3px 6px;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--text-muted);resize:none;outline:none;cursor:text;transition:all .15s;line-height:1.5;overflow:hidden;}
+textarea.tcell:hover{background:rgba(255,255,255,.04);border-color:var(--border);}
+textarea.tcell:focus{background:var(--navy-light);border-color:var(--accent);color:var(--text);}
+
+/* MIN WIDTHS PER COLUMN TYPE */
+.col-xs{min-width:80px;}
+.col-s {min-width:110px;}
+.col-m {min-width:150px;}
+.col-l {min-width:180px;}
+.col-xl{min-width:200px;}
+
+/* DATE */
+.date-wrap{display:flex;flex-direction:column;gap:2px;}
+.date-sub{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;}
+input[type="date"]{background:var(--navy-light);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:3px 5px;cursor:pointer;outline:none;width:124px;transition:border-color .15s;}
+input[type="date"]:focus{border-color:var(--accent);}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer;}
+.od input[type="date"]{border-color:rgba(224,85,85,.5);color:#f08080;}
+
+/* PERIOD (desde/hasta) */
+.period-wrap{display:flex;flex-direction:column;gap:4px;min-width:130px;}
+.period-row{display:flex;align-items:center;gap:5px;}
+.period-lbl{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;width:36px;flex-shrink:0;}
+
+/* PROGRESS SLIDER */
+.row-prog{display:flex;flex-direction:column;gap:4px;min-width:110px;}
+.rp-row{display:flex;align-items:center;justify-content:space-between;}
+.rp-lbl{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;}
+input[type="number"].rp-num{background:transparent;border:none;outline:none;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);width:34px;text-align:right;cursor:text;padding:0;}
+input[type="number"].rp-num:focus{color:var(--accent);}
+input[type="range"].rp-slider{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;cursor:pointer;background:rgba(255,255,255,.07);border:none;padding:0;}
+input[type="range"].rp-slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--navy);}
+input[type="range"].rp-slider::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--navy);}
+
+/* MONTO */
+.monto-wrap{display:flex;flex-direction:column;gap:2px;min-width:120px;}
+.monto-sub{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;}
+input.monto-inp{background:transparent;border:1px solid transparent;border-radius:5px;padding:3px 6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);outline:none;width:100%;transition:all .15s;text-align:right;}
+input.monto-inp:hover{background:rgba(255,255,255,.04);border-color:var(--border);}
+input.monto-inp:focus{background:var(--navy-light);border-color:var(--accent);}
+.monto-fmt{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);text-align:right;min-height:14px;}
+.monto-fmt.adjud{color:var(--amber);}
+
+/* OFERTAS */
+.ofertas-wrap{min-width:170px;}
+.oferta-item{display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:11px;}
+.oferta-prv{color:var(--text-muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.oferta-mnt{font-family:'DM Mono',monospace;color:var(--green);white-space:nowrap;}
+.oferta-rm{background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:0 2px;flex-shrink:0;}
+.add-oferta-btn{font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;padding:2px 0;display:flex;align-items:center;gap:3px;}
+.add-oferta-btn:hover{color:#6ba0f9;}
+.oferta-form{display:none;flex-direction:column;gap:4px;margin-top:4px;padding:6px;background:rgba(255,255,255,.04);border-radius:6px;border:1px solid var(--border);}
+.oferta-form.open{display:flex;}
+.oferta-form input{background:var(--navy-light);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 7px;outline:none;width:100%;}
+.oferta-form input:focus{border-color:var(--accent);}
+.oferta-form-btns{display:flex;gap:5px;}
+.ok-btn{background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:11px;padding:3px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.ok-btn:hover{background:#6ba0f9;}
+.cancel-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:11px;padding:3px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* ALERTA */
+.alerta-wrap{min-width:140px;}
+.alerta-badge-row{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.alerta-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ad-sin{background:#4a566a;} .ad-info{background:#4f8ef7;}
+.ad-aviso{background:#f5a623;} .ad-critica{background:#e05555;}
+
+/* TEAM */
+.team-wrap{display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-width:100px;}
+.avatar{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;cursor:default;flex-shrink:0;border:1.5px solid var(--navy);}
+.av0{background:#332e5a;color:#c4b0fc;} .av1{background:#1b3b35;color:#5ddba0;}
+.av2{background:#3b2020;color:#f08080;} .av3{background:#1e2f50;color:#7eb3fb;}
+.av4{background:#1a3320;color:#7dd8a8;} .av5{background:#3a2c10;color:#f9c85a;}
+.av-add{background:transparent;border:1.5px dashed rgba(138,150,168,.35);border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-muted);cursor:pointer;flex-shrink:0;transition:all .15s;}
+.av-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.mtt{position:relative;display:inline-block;}
+.mtt-tip{visibility:hidden;opacity:0;background:var(--navy-mid);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:6px;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;z-index:300;transition:opacity .15s;display:flex;align-items:center;gap:8px;pointer-events:none;}
+.mtt:hover .mtt-tip{visibility:visible;opacity:1;pointer-events:auto;}
+.tip-rm{background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:0;}
+.add-member-row{display:none;gap:4px;align-items:center;margin-top:4px;}
+.add-member-row.open{display:flex;}
+input.name-inp{background:var(--navy-light);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 7px;outline:none;width:110px;}
+input.name-inp:focus{border-color:var(--accent);}
+
+/* DELETE */
+.del-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;border-radius:4px;transition:all .15s;font-size:14px;line-height:1;}
+.del-btn:hover{color:var(--red);background:var(--red-dim);}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--navy-mid);border:1px solid var(--green);color:var(--green);padding:9px 16px;border-radius:var(--radius);font-size:12px;display:flex;align-items:center;gap:8px;transform:translateY(70px);opacity:0;transition:all .3s;z-index:999;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--navy-mid);border:1px solid var(--border);border-radius:12px;padding:26px;width:420px;max-width:92vw;}
+.modal h3{font-size:15px;font-weight:500;margin-bottom:8px;}
+.modal p{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:18px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+.empty{text-align:center;padding:40px;color:var(--text-muted);font-size:13px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <span class="logo">ANES</span>
+    <span class="header-title">Matriz de Consolidaciones 2026</span>
+  </div>
+  <div class="header-right">
+    <div class="save-ind" id="saveInd"><div class="save-dot"></div>Guardado</div>
+    <button class="btn btn-outline" onclick="exportCSV()">&#8595; Exportar CSV</button>
+    <button class="btn btn-danger" onclick="openModal('resetModal')">&#8635; Reiniciar</button>
+  </div>
+</header>
+
+<main>
+  <div class="po-wrap">
+    <div class="po-header">
+      <span class="po-title">Progreso general de consolidacion</span>
+      <span class="po-pct" id="poPct">0%</span>
+    </div>
+    <div class="po-track"><div class="po-fill" id="poFill" style="width:0%"></div></div>
+    <div class="po-pills" id="poPills"></div>
+  </div>
+
+  <div class="stats-bar" id="statsBar"></div>
+
+  <div class="filters-bar">
+    <div class="filter-group"><span class="filter-label">Tipo</span>
+      <select class="filt" id="fTipo" onchange="render()">
+        <option value="">Todos</option><option>Servicio</option><option>Adquisicion</option>
+      </select>
+    </div>
+    <div class="filter-group"><span class="filter-label">Area</span>
+      <select class="filt" id="fArea" onchange="render()">
+        <option value="">Todas</option>
+        <option>Servicios Generales</option><option>Servicios Hospitalarios</option>
+        <option>Informatica</option><option>Recursos Humanos</option>
+      </select>
+    </div>
+    <div class="filter-group"><span class="filter-label">Estado</span>
+      <select class="filt" id="fEstado" onchange="render()">
+        <option value="">Todos</option><option>Pendiente</option><option>En proceso</option>
+        <option>En revision</option><option>Completado</option><option>Bloqueado</option>
+      </select>
+    </div>
+    <div class="filter-group"><span class="filter-label">Criticidad</span>
+      <select class="filt" id="fCrit" onchange="render()">
+        <option value="">Todas</option><option>Alta</option><option>Media</option><option>Baja</option>
+      </select>
+    </div>
+    <div class="filter-group"><span class="filter-label">Alerta</span>
+      <select class="filt" id="fAlerta" onchange="render()">
+        <option value="">Todas</option><option>Sin alerta</option><option>Informativa</option>
+        <option>Aviso</option><option>Critica</option>
+      </select>
+    </div>
+    <div class="filter-group"><span class="filter-label">Inciso</span>
+      <select class="filt" id="fInciso" onchange="render()">
+        <option value="">Todos</option>
+        <option>Inciso 1</option><option>Inciso 2</option><option>Inciso 3</option><option>Inciso 4</option>
+      </select>
+    </div>
+    <div class="filters-right">
+      <span class="results-count" id="countLbl">-- objetos</span>
+      <button class="btn btn-green" onclick="addRow()">+ Nueva tarea</button>
+    </div>
+  </div>
+
+  <div class="table-outer">
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Nro Expediente</th>
+          <th>Objeto / Tarea</th>
+          <th>Area Requirente</th>
+          <th>Area Responsable</th>
+          <th>Hospitales</th>
+          <th>Estrategia</th>
+          <th>Inciso Presup.</th>
+          <th>Tipo Contratacion</th>
+          <th>Criticidad</th>
+          <th>Estado</th>
+          <th>Progreso</th>
+          <th>Anio Gestion</th>
+          <th>Plazo Max. Entrega</th>
+          <th>Periodo Desde</th>
+          <th>Periodo Hasta</th>
+          <th>Monto Estimado</th>
+          <th>Monto Adjudicacion</th>
+          <th>Ofertas Proveedores</th>
+          <th>Proveedores Sugeridos</th>
+          <th>Proveedor Adjudicado</th>
+          <th>Nro Resolucion</th>
+          <th>Equipo Responsable</th>
+          <th>Observaciones</th>
+          <th>Alertas</th>
+          <th style="width:32px;"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="emptyMsg" style="display:none;">
+      Sin resultados. <a href="#" onclick="clearFilters();return false;" style="color:var(--accent);">Limpiar filtros</a>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast">Cambios guardados</div>
+
+<div class="modal-overlay" id="resetModal">
+  <div class="modal">
+    <h3>Reiniciar datos</h3>
+    <p>Se eliminaran todos los datos cargados y se restauraran los 30 objetos originales. Esta accion no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('resetModal')">Cancelar</button>
+      <button class="btn btn-danger" onclick="resetData()">Reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="delModal">
+  <div class="modal">
+    <h3>Eliminar tarea</h3>
+    <p id="delTxt">Esta accion no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('delModal')">Cancelar</button>
+      <button class="btn btn-danger" onclick="confirmDel()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var SK = 'anes_v5';
+var SK_LEGACY = ['anes_v4','anes_matriz_v3','anes_matriz_v2','anes_matriz_v1'];
+
+var TIPOS       = ['Servicio','Adquisicion'];
+var ESTADOS     = ['Pendiente','En proceso','En revision','Completado','Bloqueado'];
+var CRITS       = ['Alta','Media','Baja'];
+var ESTRATEGIAS = ['prioritaria','condicion','parcial'];
+var EST_LBL     = {prioritaria:'Prioritaria',condicion:'Viable c/condicion',parcial:'Parcial'};
+var TIPOS_CONT  = ['','Licitacion Publica','Licitacion Privada','Contratacion Directa','Acuerdo Marco','Concurso de Precios','Compra Menor'];
+var INCISOS     = ['','Inciso 1','Inciso 2','Inciso 3','Inciso 4'];
+var ALERTAS_OPT = ['Sin alerta','Informativa','Aviso','Critica'];
+var ALERT_CLS   = {'Sin alerta':'b-alerta-sin','Informativa':'b-alerta-info','Aviso':'b-alerta-aviso','Critica':'b-alerta-critica'};
+var ALERT_DOT   = {'Sin alerta':'ad-sin','Informativa':'ad-info','Aviso':'ad-aviso','Critica':'ad-critica'};
+
+var ECLS = {'Pendiente':'b-pend','En proceso':'b-proc','En revision':'b-rev','Completado':'b-comp','Bloqueado':'b-bloq'};
+var CCLS = {'Alta':'b-calta','Media':'b-cmedia','Baja':'b-cbaja'};
+var EPCT = {'Pendiente':0,'En proceso':40,'En revision':75,'Completado':100,'Bloqueado':15};
+
+var BASE = [
+  {tipo:'Servicio',objeto:'ART - riesgos del trabajo',area:'Recursos Humanos',hospitales:'Todos',estrategia:'prioritaria'},
+  {tipo:'Servicio',objeto:'Telefonia celular movil y datos',area:'Informatica',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Servicio',objeto:'Cuentas sueldo',area:'Recursos Humanos',hospitales:'Todos',estrategia:'prioritaria'},
+  {tipo:'Servicio',objeto:'Disposicion final de residuos',area:'Servicios Generales',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Servicio',objeto:'Limpieza edilicia',area:'Servicios Generales',hospitales:'Carrillo, Bonaparte, Sommer, Posadas',estrategia:'parcial'},
+  {tipo:'Servicio',objeto:'Mantenimiento espacios verdes',area:'Servicios Generales',hospitales:'Bonaparte, INAREPS, Sommer',estrategia:'parcial'},
+  {tipo:'Servicio',objeto:'Provision de combustible',area:'Servicios Generales',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Servicio',objeto:'Racionamiento de cocidos',area:'Servicios Hospitalarios',hospitales:'Carrillo, Bonaparte, INAREPS, Sommer',estrategia:'parcial'},
+  {tipo:'Servicio',objeto:'Seguridad',area:'Servicios Generales',hospitales:'Carrillo, INAREPS',estrategia:'parcial'},
+  {tipo:'Servicio',objeto:'Seguro automotor',area:'Servicios Generales',hospitales:'Posadas, INAREPS, Bonaparte, Sommer',estrategia:'parcial'},
+  {tipo:'Servicio',objeto:'Seguro integral de comercio',area:'Servicios Generales',hospitales:'Todos',estrategia:'prioritaria'},
+  {tipo:'Servicio',objeto:'Mantenimiento aires acondicionados',area:'Servicios Generales',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Servicio',objeto:'Mantenimiento equipos hospitalarios',area:'Servicios Hospitalarios',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Servicio',objeto:'Mantenimiento grupos electrogenos',area:'Servicios Generales',hospitales:'Posadas, Bonaparte, Sommer',estrategia:'parcial'},
+  {tipo:'Servicio',objeto:'Telepeaje',area:'Servicios Generales',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Adquisicion',objeto:'Papel obra (acuerdo marco)',area:'Servicios Generales',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Adquisicion',objeto:'Articulos de libreria',area:'Servicios Generales',hospitales:'Todos',estrategia:'prioritaria'},
+  {tipo:'Adquisicion',objeto:'Articulos descartables',area:'Servicios Hospitalarios',hospitales:'Todos',estrategia:'prioritaria'},
+  {tipo:'Adquisicion',objeto:'Equipos de computacion',area:'Informatica',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Adquisicion',objeto:'Gases medicinales',area:'Servicios Hospitalarios',hospitales:'Todos',estrategia:'prioritaria'},
+  {tipo:'Adquisicion',objeto:'Insumos electricos',area:'Servicios Generales',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Adquisicion',objeto:'Insumos para informatica',area:'Informatica',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Adquisicion',objeto:'Insumos de ferreteria',area:'Servicios Generales',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Adquisicion',objeto:'Licencias de software',area:'Informatica',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Adquisicion',objeto:'Medicamentos',area:'Servicios Hospitalarios',hospitales:'Todos',estrategia:'prioritaria'},
+  {tipo:'Adquisicion',objeto:'Reactivos para laboratorio',area:'Servicios Hospitalarios',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Adquisicion',objeto:'Alimentos enterales y parenterales',area:'Servicios Hospitalarios',hospitales:'Todos',estrategia:'prioritaria'},
+  {tipo:'Adquisicion',objeto:'Agua potable y mineralizada',area:'Servicios Generales',hospitales:'Todos',estrategia:'condicion'},
+  {tipo:'Adquisicion',objeto:'Mantenimiento de ascensores',area:'Servicios Generales',hospitales:'Posadas, Carrillo, INAREPS',estrategia:'parcial'},
+  {tipo:'Adquisicion',objeto:'Control de plagas',area:'Servicios Generales',hospitales:'Posadas, Carrillo, Sommer, Bonaparte',estrategia:'parcial'}
+];
+
+var data = [];
+var pendingDelId = null;
+
+function mkRow(b) {
+  return {
+    id:               String(Date.now()) + String(Math.floor(Math.random()*100000)),
+    tipo:             b.tipo             || 'Servicio',
+    nroExpediente:    b.nroExpediente    || '',
+    objeto:           b.objeto           || 'Nueva tarea',
+    areaRequirente:   b.areaRequirente   || '',
+    area:             b.area             || 'Servicios Generales',
+    hospitales:       b.hospitales       || 'Todos',
+    estrategia:       b.estrategia       || 'condicion',
+    inciso:           b.inciso           || '',
+    tipoContratacion: b.tipoContratacion || '',
+    criticidad:       b.criticidad       || 'Media',
+    estado:           b.estado           || 'Pendiente',
+    progreso:         b.progreso         !== undefined ? Number(b.progreso) : (EPCT[b.estado||'Pendiente']||0),
+    anioGestion:      b.anioGestion      || '2026',
+    plazoEntrega:     b.plazoEntrega     || (b.fechaFinal||b.fecha1||''),
+    periodoDesde:     b.periodoDesde     || '',
+    periodoHasta:     b.periodoHasta     || '',
+    montoEstimado:    b.montoEstimado    || (b.monto||''),
+    montoAdjudicacion:b.montoAdjudicacion|| '',
+    ofertas:          b.ofertas          || [],
+    proveedoresSug:   b.proveedoresSug   || '',
+    proveedorAdj:     b.proveedorAdj     || '',
+    nroResolucion:    b.nroResolucion    || '',
+    equipo:           b.equipo           || [],
+    observaciones:    b.observaciones    || '',
+    alerta:           b.alerta           || 'Sin alerta',
+    alertaNota:       b.alertaNota       || ''
+  };
+}
+
+function loadData() {
+  var raw = null;
+  try { raw = localStorage.getItem(SK); } catch(e){}
+  if (!raw) {
+    for (var i = 0; i < SK_LEGACY.length; i++) {
+      try { raw = localStorage.getItem(SK_LEGACY[i]); } catch(e){}
+      if (raw) break;
+    }
+  }
+  if (raw) {
+    try {
+      data = JSON.parse(raw).map(function(d){ return mkRow(d); });
+      saveQuiet();
+    } catch(e) { data = BASE.map(function(b){ return mkRow(b); }); }
+  } else {
+    data = BASE.map(function(b){ return mkRow(b); });
+  }
+}
+
+function saveQuiet() {
+  try { localStorage.setItem(SK, JSON.stringify(data)); } catch(e){}
+}
+
+var saveTimer = null;
+function save() {
+  saveQuiet();
+  var ind = document.getElementById('saveInd');
+  ind.classList.add('show');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){ ind.classList.remove('show'); }, 2500);
+  var t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(function(){ t.classList.remove('show'); }, 1800);
+}
+
+function byId(id) {
+  for (var i = 0; i < data.length; i++) { if (String(data[i].id) === String(id)) return data[i]; }
+  return null;
+}
+function ini(n) { return n.trim().split(' ').map(function(w){ return w[0]||''; }).join('').toUpperCase().slice(0,2); }
+function isOD(d, estado) { return d && estado !== 'Completado' && new Date(d) < new Date(); }
+
+function fmtMonto(v) {
+  if (!v && v !== 0) return '';
+  var n = parseFloat(String(v).replace(/[^\d.]/g,''));
+  if (isNaN(n)) return '';
+  return '$ ' + n.toLocaleString('es-AR',{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+function pColor(pct) {
+  return pct >= 100 ? '#34c77b' : pct >= 70 ? '#4f8ef7' : pct >= 30 ? '#f5a623' : '#4a566a';
+}
+function selOpts(arr, cur) {
+  return arr.map(function(v){ return '<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>'; }).join('');
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function ecell(id, field, val, extra) {
+  extra = extra || '';
+  return '<span class="ecell'+extra+'" contenteditable="true" spellcheck="false" onblur="setF(\''+id+'\',\''+field+'\',this.innerText.trim())" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">'+esc(val)+'</span>';
+}
+
+// ─── OVERVIEW ─────────────────────────────────────────────────────────────────
+function renderOverview() {
+  var cnt = {'Pendiente':0,'En proceso':0,'En revision':0,'Completado':0,'Bloqueado':0};
+  var tot = 0;
+  data.forEach(function(d){
+    if (cnt[d.estado] !== undefined) cnt[d.estado]++;
+    tot += (typeof d.progreso === 'number' ? d.progreso : (EPCT[d.estado]||0));
+  });
+  var avg = data.length ? Math.round(tot/data.length) : 0;
+  document.getElementById('poPct').textContent = avg+'%';
+  document.getElementById('poFill').style.width = avg+'%';
+  var pcols = {'Pendiente':'#4a566a','En proceso':'#4f8ef7','En revision':'#f5a623','Completado':'#34c77b','Bloqueado':'#e05555'};
+  document.getElementById('poPills').innerHTML = Object.keys(cnt).map(function(k){
+    return '<div class="po-pill"><div class="po-pip" style="background:'+pcols[k]+'"></div><span>'+cnt[k]+' '+k+'</span></div>';
+  }).join('');
+}
+
+function renderStats() {
+  var t    = data.length;
+  var comp = data.filter(function(d){ return d.estado==='Completado'; }).length;
+  var bloq = data.filter(function(d){ return d.estado==='Bloqueado'; }).length;
+  var proc = data.filter(function(d){ return d.estado==='En proceso'||d.estado==='En revision'; }).length;
+  var alta = data.filter(function(d){ return d.criticidad==='Alta'; }).length;
+  var crit = data.filter(function(d){ return d.alerta==='Critica'; }).length;
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat-card sc-accent"><div class="stat-label">Total</div><div class="stat-value sv-accent">'+t+'</div></div>'+
+    '<div class="stat-card sc-purple"><div class="stat-label">Crit. Alta</div><div class="stat-value sv-purple">'+alta+'</div></div>'+
+    '<div class="stat-card sc-red"><div class="stat-label">Alertas Criticas</div><div class="stat-value sv-red">'+crit+'</div></div>'+
+    '<div class="stat-card sc-amber"><div class="stat-label">En Proceso</div><div class="stat-value sv-amber">'+proc+'</div></div>'+
+    '<div class="stat-card sc-green"><div class="stat-label">Completados</div><div class="stat-value sv-green">'+comp+'</div></div>'+
+    '<div class="stat-card sc-red"><div class="stat-label">Bloqueados</div><div class="stat-value sv-red">'+bloq+'</div></div>';
+}
+
+// ─── RENDER TABLE ─────────────────────────────────────────────────────────────
+function render() {
+  var fTipo   = document.getElementById('fTipo').value;
+  var fArea   = document.getElementById('fArea').value;
+  var fEstado = document.getElementById('fEstado').value;
+  var fCrit   = document.getElementById('fCrit').value;
+  var fAlerta = document.getElementById('fAlerta').value;
+  var fInciso = document.getElementById('fInciso').value;
+
+  var idxs = [];
+  for (var i = 0; i < data.length; i++) {
+    var r = data[i];
+    if (fTipo   && r.tipo       !== fTipo)   continue;
+    if (fArea   && r.area       !== fArea)   continue;
+    if (fEstado && r.estado     !== fEstado) continue;
+    if (fCrit   && r.criticidad !== fCrit)   continue;
+    if (fAlerta && r.alerta     !== fAlerta) continue;
+    if (fInciso && r.inciso     !== fInciso) continue;
+    idxs.push(i);
+  }
+
+  document.getElementById('countLbl').textContent = idxs.length+' objeto'+(idxs.length!==1?'s':'');
+  document.getElementById('emptyMsg').style.display = idxs.length ? 'none' : 'block';
+
+  var estBcls = {prioritaria:'b-green',condicion:'b-amber',parcial:'b-blue'};
+  var html = '';
+
+  idxs.forEach(function(idx){
+    var r   = data[idx];
+    var id  = r.id;
+    var pct = typeof r.progreso === 'number' ? r.progreso : (EPCT[r.estado]||0);
+    var col = pColor(pct);
+
+    // avatars
+    var avs = '';
+    (r.equipo||[]).forEach(function(m,mi){
+      avs += '<div class="mtt"><div class="avatar av'+(mi%6)+'">'+ini(m)+'</div>'+
+        '<div class="mtt-tip">'+esc(m)+' <button class="tip-rm" onclick="rmMember(\''+id+'\','+mi+')">x</button></div></div>';
+    });
+
+    // ofertas
+    var ofHtml = '';
+    (r.ofertas||[]).forEach(function(o,oi){
+      ofHtml += '<div class="oferta-item">'+
+        '<span class="oferta-prv" title="'+esc(o.prv)+'">'+esc(o.prv)+'</span>'+
+        '<span class="oferta-mnt">'+fmtMonto(o.mnt)+'</span>'+
+        '<button class="oferta-rm" onclick="rmOferta(\''+id+'\','+oi+')">x</button>'+
+        '</div>';
+    });
+
+    html += '<tr class="crit-'+r.criticidad+'">';
+
+    // 1 Tipo
+    html += '<td class="col-s"><span class="badge '+(r.tipo==='Servicio'?'b-blue':'b-red')+'">'+r.tipo+'</span>'+
+      '<select class="csel" onchange="setF(\''+id+'\',\'tipo\',this.value)">'+selOpts(TIPOS,r.tipo)+'</select></td>';
+    // 2 Nro Expediente
+    html += '<td class="col-m">'+ecell(id,'nroExpediente',r.nroExpediente,' mono')+'</td>';
+    // 3 Objeto
+    html += '<td class="col-xl">'+ecell(id,'objeto',r.objeto)+'</td>';
+    // 4 Area Requirente
+    html += '<td class="col-m">'+ecell(id,'areaRequirente',r.areaRequirente,' muted')+'</td>';
+    // 5 Area Responsable
+    html += '<td class="col-m">'+ecell(id,'area',r.area,' muted')+'</td>';
+    // 6 Hospitales
+    html += '<td class="col-m">'+ecell(id,'hospitales',r.hospitales,' muted')+'</td>';
+    // 7 Estrategia
+    html += '<td class="col-m"><span class="badge '+(estBcls[r.estrategia]||'b-gray')+'">'+(EST_LBL[r.estrategia]||r.estrategia)+'</span>'+
+      '<select class="csel" onchange="setF(\''+id+'\',\'estrategia\',this.value)">'+
+      ESTRATEGIAS.map(function(e){ return '<option value="'+e+'"'+(e===r.estrategia?' selected':'')+'>'+EST_LBL[e]+'</option>'; }).join('')+
+      '</select></td>';
+    // 8 Inciso
+    html += '<td class="col-s"><select class="csel" onchange="setF(\''+id+'\',\'inciso\',this.value)">'+
+      INCISOS.map(function(v){ return '<option value="'+v+'"'+(v===r.inciso?' selected':'')+'>'+( v||'-- --')+'</option>'; }).join('')+
+      '</select></td>';
+    // 9 Tipo Contratacion
+    html += '<td class="col-m"><select class="csel" onchange="setF(\''+id+'\',\'tipoContratacion\',this.value)">'+
+      TIPOS_CONT.map(function(v){ return '<option value="'+v+'"'+(v===r.tipoContratacion?' selected':'')+'>'+( v||'-- Seleccionar --')+'</option>'; }).join('')+
+      '</select></td>';
+    // 10 Criticidad
+    html += '<td class="col-s"><span class="badge '+(CCLS[r.criticidad]||'b-gray')+'">'+r.criticidad+'</span>'+
+      '<select class="csel" onchange="setCrit(\''+id+'\',this.value)">'+selOpts(CRITS,r.criticidad)+'</select></td>';
+    // 11 Estado
+    html += '<td class="col-m"><span class="badge '+(ECLS[r.estado]||'b-pend')+'">'+r.estado+'</span>'+
+      '<select class="csel" onchange="setEstado(\''+id+'\',this.value)">'+selOpts(ESTADOS,r.estado)+'</select></td>';
+    // 12 Progreso
+    html += '<td class="col-m"><div class="row-prog">'+
+      '<div class="rp-row"><span class="rp-lbl" id="rplbl-'+id+'">'+pct+'%</span>'+
+      '<input type="number" class="rp-num" min="0" max="100" value="'+pct+'" onchange="setProg(\''+id+'\',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()"></div>'+
+      '<input type="range" class="rp-slider" min="0" max="100" value="'+pct+'" id="rpsl-'+id+'" style="background:linear-gradient(90deg,'+col+' '+pct+'%,rgba(255,255,255,.07) '+pct+'%)" oninput="liveProg(\''+id+'\',this.value)" onchange="setProg(\''+id+'\',this.value)">'+
+      '</div></td>';
+    // 13 Anio Gestion
+    html += '<td class="col-xs">'+ecell(id,'anioGestion',r.anioGestion,' mono')+'</td>';
+    // 14 Plazo Max Entrega
+    var odC = isOD(r.plazoEntrega,r.estado) ? ' od' : '';
+    html += '<td class="col-s'+odC+'"><div class="date-wrap"><span class="date-sub">Plazo max.</span>'+
+      '<input type="date" value="'+r.plazoEntrega+'" onchange="setF(\''+id+'\',\'plazoEntrega\',this.value)"></div></td>';
+    // 15 Periodo Desde
+    html += '<td class="col-s"><div class="date-wrap"><span class="date-sub">Desde</span>'+
+      '<input type="date" value="'+r.periodoDesde+'" onchange="setF(\''+id+'\',\'periodoDesde\',this.value)"></div></td>';
+    // 16 Periodo Hasta
+    html += '<td class="col-s"><div class="date-wrap"><span class="date-sub">Hasta</span>'+
+      '<input type="date" value="'+r.periodoHasta+'" onchange="setF(\''+id+'\',\'periodoHasta\',this.value)"></div></td>';
+    // 17 Monto Estimado
+    html += '<td class="col-m"><div class="monto-wrap"><span class="monto-sub">Estimado</span>'+
+      '<input class="monto-inp" type="text" value="'+esc(r.montoEstimado)+'" placeholder="0" id="me-'+id+'" onblur="setMonto(\''+id+'\',\'montoEstimado\',this.value,\'mef-'+id+'\')" onkeydown="if(event.key===\'Enter\')this.blur()">'+
+      '<span class="monto-fmt" id="mef-'+id+'">'+fmtMonto(r.montoEstimado)+'</span></div></td>';
+    // 18 Monto Adjudicacion
+    html += '<td class="col-m"><div class="monto-wrap"><span class="monto-sub">Adjudicado</span>'+
+      '<input class="monto-inp" type="text" value="'+esc(r.montoAdjudicacion)+'" placeholder="0" id="ma-'+id+'" onblur="setMonto(\''+id+'\',\'montoAdjudicacion\',this.value,\'maf-'+id+'\')" onkeydown="if(event.key===\'Enter\')this.blur()">'+
+      '<span class="monto-fmt adjud" id="maf-'+id+'">'+fmtMonto(r.montoAdjudicacion)+'</span></div></td>';
+    // 19 Ofertas
+    html += '<td class="col-xl"><div class="ofertas-wrap">'+ofHtml+
+      '<button class="add-oferta-btn" onclick="toggleOferta(\''+id+'\')">+ Agregar oferta</button>'+
+      '<div class="oferta-form" id="of-'+id+'">'+
+        '<input type="text" id="of-prv-'+id+'" placeholder="Nombre proveedor">'+
+        '<input type="text" id="of-mnt-'+id+'" placeholder="Monto ofertado" inputmode="numeric">'+
+        '<div class="oferta-form-btns">'+
+          '<button class="ok-btn" onclick="addOferta(\''+id+'\')">Agregar</button>'+
+          '<button class="cancel-btn" onclick="toggleOferta(\''+id+'\')">Cancelar</button>'+
+        '</div>'+
+      '</div>'+
+      '</div></td>';
+    // 20 Proveedores Sugeridos
+    html += '<td class="col-l"><textarea class="tcell" rows="2" onblur="setF(\''+id+'\',\'proveedoresSug\',this.value)" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();this.blur();}">'+esc(r.proveedoresSug)+'</textarea></td>';
+    // 21 Proveedor Adjudicado
+    html += '<td class="col-m">'+ecell(id,'proveedorAdj',r.proveedorAdj,' muted')+'</td>';
+    // 22 Nro Resolucion
+    html += '<td class="col-m">'+ecell(id,'nroResolucion',r.nroResolucion,' mono')+'</td>';
+    // 23 Equipo
+    html += '<td class="col-m"><div class="team-wrap" id="team-'+id+'">'+avs+
+      '<div class="av-add" onclick="toggleMember(\''+id+'\')" title="Agregar">+</div></div>'+
+      '<div class="add-member-row" id="amr-'+id+'">'+
+        '<input class="name-inp" type="text" id="ainp-'+id+'" placeholder="Nombre" onkeydown="if(event.key===\'Enter\')addMember(\''+id+'\')">'+
+        '<button class="ok-btn" onclick="addMember(\''+id+'\')">OK</button>'+
+      '</div></td>';
+    // 24 Observaciones
+    html += '<td class="col-xl"><textarea class="tcell" rows="2" onblur="setF(\''+id+'\',\'observaciones\',this.value)" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();this.blur();}">'+esc(r.observaciones)+'</textarea></td>';
+    // 25 Alertas
+    html += '<td class="col-m"><div class="alerta-wrap">'+
+      '<div class="alerta-badge-row">'+
+        '<div class="alerta-dot '+(ALERT_DOT[r.alerta]||'ad-sin')+'"></div>'+
+        '<span class="badge '+(ALERT_CLS[r.alerta]||'b-alerta-sin')+'" style="font-size:10px;">'+r.alerta+'</span>'+
+      '</div>'+
+      '<select class="csel" onchange="setAlerta(\''+id+'\',this.value)">'+selOpts(ALERTAS_OPT,r.alerta)+'</select>'+
+      '<textarea class="tcell" rows="1" style="min-width:120px;margin-top:3px;" placeholder="Nota de alerta..." onblur="setF(\''+id+'\',\'alertaNota\',this.value)" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();this.blur();}">'+esc(r.alertaNota)+'</textarea>'+
+      '</div></td>';
+    // 26 Delete
+    html += '<td><button class="del-btn" onclick="openDel(\''+id+'\')" title="Eliminar">x</button></td>';
+    html += '</tr>';
+  });
+
+  document.getElementById('tbody').innerHTML = html;
+  renderStats();
+  renderOverview();
+}
+
+// ─── SETTERS ──────────────────────────────────────────────────────────────────
+function setF(id, field, val) {
+  var r = byId(id); if (!r) return;
+  r[field] = val; save();
+}
+function setEstado(id, val) {
+  var r = byId(id); if (!r) return;
+  var auto = [0,15,40,75,100];
+  if (auto.indexOf(r.progreso) !== -1) r.progreso = EPCT[val]||0;
+  r.estado = val; save(); render();
+}
+function setCrit(id, val) {
+  var r = byId(id); if (!r) return;
+  r.criticidad = val; save(); render();
+}
+function setAlerta(id, val) {
+  var r = byId(id); if (!r) return;
+  r.alerta = val; save(); render();
+}
+function liveProg(id, val) {
+  val = Math.min(100,Math.max(0,parseInt(val)||0));
+  var sl = document.getElementById('rpsl-'+id);
+  var lb = document.getElementById('rplbl-'+id);
+  if (sl) sl.style.background = 'linear-gradient(90deg,'+pColor(val)+' '+val+'%,rgba(255,255,255,.07) '+val+'%)';
+  if (lb) lb.textContent = val+'%';
+}
+function setProg(id, val) {
+  val = Math.min(100,Math.max(0,parseInt(val)||0));
+  var r = byId(id); if (!r) return;
+  r.progreso = val; liveProg(id,val); save();
+  renderOverview(); renderStats();
+}
+function setMonto(id, field, val, fmtId) {
+  var raw = String(val).replace(/[^\d.]/g,'');
+  var r = byId(id); if (!r) return;
+  r[field] = raw;
+  var el = document.getElementById(fmtId);
+  if (el) el.textContent = fmtMonto(raw);
+  save();
+}
+
+// ─── OFERTAS ──────────────────────────────────────────────────────────────────
+function toggleOferta(id) {
+  var el = document.getElementById('of-'+id);
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) document.getElementById('of-prv-'+id).focus();
+}
+function addOferta(id) {
+  var prv = document.getElementById('of-prv-'+id).value.trim();
+  var mnt = document.getElementById('of-mnt-'+id).value.trim().replace(/[^\d.]/g,'');
+  if (!prv) return;
+  var r = byId(id); if (!r) return;
+  r.ofertas.push({prv:prv,mnt:mnt});
+  document.getElementById('of-prv-'+id).value = '';
+  document.getElementById('of-mnt-'+id).value = '';
+  document.getElementById('of-'+id).classList.remove('open');
+  save(); render();
+}
+function rmOferta(id, oi) {
+  var r = byId(id); if (!r) return;
+  r.ofertas.splice(oi,1); save(); render();
+}
+
+// ─── TEAM ─────────────────────────────────────────────────────────────────────
+function toggleMember(id) {
+  var el = document.getElementById('amr-'+id);
+  var open = el.classList.toggle('open');
+  if (open) document.getElementById('ainp-'+id).focus();
+}
+function addMember(id) {
+  var inp = document.getElementById('ainp-'+id);
+  var name = inp.value.trim(); if (!name) return;
+  var r = byId(id); if (!r) return;
+  r.equipo.push(name); inp.value = '';
+  document.getElementById('amr-'+id).classList.remove('open');
+  save(); render();
+}
+function rmMember(id, mi) {
+  var r = byId(id); if (!r) return;
+  r.equipo.splice(mi,1); save(); render();
+}
+
+// ─── ADD / DEL ROW ────────────────────────────────────────────────────────────
+function addRow() {
+  data.unshift(mkRow({})); save(); render();
+  setTimeout(function(){
+    var c = document.querySelector('#tbody tr:first-child .ecell');
+    if (c) { c.focus(); document.execCommand('selectAll',false,null); }
+  }, 80);
+}
+function openDel(id) {
+  pendingDelId = id;
+  var r = byId(id);
+  document.getElementById('delTxt').textContent =
+    'Eliminar "' + (r ? r.objeto : 'esta tarea') + '"? Esta accion no se puede deshacer.';
+  openModal('delModal');
+}
+function confirmDel() {
+  if (!pendingDelId) return;
+  data = data.filter(function(d){ return String(d.id) !== String(pendingDelId); });
+  pendingDelId = null; save(); closeModal('delModal'); render();
+}
+
+// ─── MODAL / MISC ─────────────────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function resetData()    { localStorage.removeItem(SK); loadData(); closeModal('resetModal'); render(); }
+function clearFilters() {
+  ['fTipo','fArea','fEstado','fCrit','fAlerta','fInciso'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  render();
+}
+document.querySelectorAll('.modal-overlay').forEach(function(o){
+  o.addEventListener('click', function(e){
+    if (e.target === o) { o.classList.remove('open'); pendingDelId = null; }
+  });
+});
+
+// ─── EXPORT CSV ───────────────────────────────────────────────────────────────
+function exportCSV() {
+  var h = ['Tipo','Nro Expediente','Objeto','Area Requirente','Area Responsable','Hospitales',
+    'Estrategia','Inciso','Tipo Contratacion','Criticidad','Estado','Progreso %',
+    'Anio Gestion','Plazo Max Entrega','Periodo Desde','Periodo Hasta',
+    'Monto Estimado','Monto Adjudicacion','Ofertas',
+    'Proveedores Sugeridos','Proveedor Adjudicado','Nro Resolucion',
+    'Equipo','Observaciones','Alerta','Nota Alerta'];
+  var rows = data.map(function(r){
+    var ofs = (r.ofertas||[]).map(function(o){ return o.prv+': $'+o.mnt; }).join(' | ');
+    return [r.tipo,r.nroExpediente,r.objeto,r.areaRequirente,r.area,r.hospitales,
+      EST_LBL[r.estrategia]||r.estrategia,r.inciso,r.tipoContratacion,r.criticidad,r.estado,r.progreso||0,
+      r.anioGestion,r.plazoEntrega,r.periodoDesde,r.periodoHasta,
+      r.montoEstimado,r.montoAdjudicacion,ofs,
+      r.proveedoresSug,r.proveedorAdj,r.nroResolucion,
+      (r.equipo||[]).join(' | '),r.observaciones,r.alerta,r.alertaNota];
+  });
+  var csv = [h].concat(rows).map(function(row){
+    return row.map(function(c){ return '"'+String(c||'').replace(/"/g,'""')+'"'; }).join(',');
+  }).join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download = 'anes_consolidaciones_2026.csv';
+  a.click();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadData();
+render();
+</script>
+</body>
+</html>
