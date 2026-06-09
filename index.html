@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --navy:#141c2e; --navy-mid:#1e2a42; --navy-light:#28374f;
+  --navy:#141c2e; --navy-mid:#1e2a42; --navy-light:#28374f;h
   --accent:#4f8ef7; --accent-dim:rgba(79,142,247,.12);
-  --green:#34c77b; --green-dim:rgba(52,199,123,.12);
+  --green:#34c77b; --green-dim:rgba(52,199,123,.12);h
   --amber:#f5a623; --amber-dim:rgba(245,166,35,.12);
   --red:#e05555; --red-dim:rgba(224,85,85,.12);
   --purple:#a78bfa; --teal:#2dd4bf;
@@ -370,7 +370,7 @@ function mkRow(b) {
     nroExpediente:    b.nroExpediente    || '',
     objeto:           b.objeto           || 'Nueva tarea',
     areaRequirente:   b.areaRequirente   || '',
-    area:             b.area             || 'Servicios Generales',
+    area:             b.area             || 'Servicios Generales',h
     hospitales:       b.hospitales       || 'Todos',
     estrategia:       b.estrategia       || 'condicion',
     inciso:           b.inciso           || '',
@@ -694,7 +694,7 @@ function render() {
 
 
 // ─── SETTERS ──────────────────────────────────────────────────────────────────
-function setF(id,field,val){var r=byId(id);if(!r)return;r[field]=val;save();}
+function setF(id,field,val){var r=byId(id);if(!r)return;r[field]=val;save();render();}
 function setEstado(id,val){var r=byId(id);if(!r)return;var auto=[0,15,40,75,100];if(auto.indexOf(r.progreso)!==-1)r.progreso=EPCT[val]||0;r.estado=val;save();render();}
 function setCrit(id,val){var r=byId(id);if(!r)return;r.criticidad=val;save();render();}
 function setAlerta(id,val){var r=byId(id);if(!r)return;r.alerta=val;save();render();}
